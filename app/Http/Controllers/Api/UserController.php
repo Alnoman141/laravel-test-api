@@ -39,13 +39,14 @@ class UserController extends Controller
     }
 
     public function update(Request $request){
+        $user = Auth::user();
         if(isset($user)){
-            $user = Auth::user();
             $user->phone = $request->phone;
             $user->country = $request->country;
-
             try {
                 $user->save();
+                return response()->json(['success' => 'profile updateduccessful']);
+
             } catch (\Exception $ex) {
                 return response()->json(['error' => $ex->getMessage()], 403);
             }

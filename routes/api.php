@@ -16,24 +16,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });
+Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+    return $request->user();
+});
 
 // public routes
 
 Route::post('register', [AuthController::class, 'register']);
 
-Route::prefix('users')->group(function () {
-    Route::get('/', [UserController::class, 'index']);
+Route::post('login', [AuthController::class, 'login']);
 
-    Route::get('/profile', [UserController::class, 'profile']);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::get('users/', [UserController::class, 'index']);
 
-    Route::put('/profile/update', [UserController::class, 'update']);
+    Route::get('user/profile', [UserController::class, 'profile']);
 
-    Route::get('/{slug}', [UserController::class, 'show']);
+    Route::post('user/profile/update', [UserController::class, 'update']);
+
+    Route::get('user/{slug}', [UserController::class, 'show']);
 
     Route::put('/delete/{slug}', [UserController::class, 'delete']);
+
+    Route::put('user/logout', [AuthController::class, 'logout']);
 });
 
 

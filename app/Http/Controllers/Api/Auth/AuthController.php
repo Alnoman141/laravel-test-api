@@ -7,33 +7,72 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Validator;
+use Illuminate\Support\Str;
+use App\JsonResponse;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
+
+
 
 class AuthController extends Controller
 {
+    /**
+     * Create a new AuthController instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+    }
+
     public function register(Request $request){
         $validator = Validator::make(
             $request->all(),
-            array_merge(
-                $this->getValidationRules(),
-                [
-                    'password' => ['required', 'min:6'],
-                    'confirmPassword' => 'same:password',
-                ]
-            )
+            array_merge($this->getValidationRules())
         );
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 403);
         } else {
-            $params = $request->all();
-            $user = User::create([
-                'name' => $params['name'],
-                'email' => $params['email'],
-                'password' => Hash::make($params['password']),
-            ]);
+            $user = new User();
+
+            $user->name = $request->name;
+            $user->email = $request->email;
+            $user->password = Hash::make($request->password);
+            $user->slug = Str::slug($request->name);
+            try {
+                $user->save();
+                return response()->json(['success' => 'registration successful'], 200);
+            } catch (\Exception $ex) {
+                return response()->json(['error' => $ex->getMessage()], 403);
+            }
         }
     }
 
+    public function login(Request $request){
+        $credentials = $request->only('email', 'password');
+        if (!Auth::attempt($credentials)) {
+            return response()->json(new JsonResponse([], 'login_error'), Response::HTTP_UNAUTHORIZED);
+        }
+
+        $user = $request->user();
+
+        $tokenResult  = $user->createToken('authToken')->plainTextToken;
+        
+        return response()->json([
+            'access_token' => $tokenResult,
+            'token_type' => 'bearer',
+            'user' => auth()->user()
+        ]);
+
+    }
+
+    public function logout(Request $request)
+    {
+        Auth::guard('web')->logout();
+        $request->user()->currentAccessToken()->delete();
+        return response()->json((new JsonResponse())->success(['message' => 'logout successful']), Response::HTTP_OK);
+    }
 
     
     private function getValidationRules()
