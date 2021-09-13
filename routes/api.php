@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -26,20 +27,34 @@ Route::post('register', [AuthController::class, 'register']);
 
 Route::post('login', [AuthController::class, 'login']);
 
+Route::get('products', [ProductController::class, 'index']);
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users/', [UserController::class, 'index']);
 
-    Route::get('user/profile', [UserController::class, 'profile']);
+    Route::prefix('user')->group(function () {
+        Route::get('profile', [UserController::class, 'profile']);
 
-    Route::post('user/profile/update', [UserController::class, 'update']);
+        Route::post('profile/update', [UserController::class, 'update']);
 
-    Route::get('user/{slug}', [UserController::class, 'show']);
+        Route::get('{slug}', [UserController::class, 'show']);
 
-    Route::put('/delete/{slug}', [UserController::class, 'delete']);
+        Route::put('delete/{slug}', [UserController::class, 'delete']);
 
-    Route::put('user/logout', [AuthController::class, 'logout']);
+        Route::put('logout', [AuthController::class, 'logout']);
 
-    Route::post('user/change-password/{slug}', [AuthController::class, 'changePassword']);
+        Route::post('change-password/{slug}', [AuthController::class, 'changePassword']);
+    });
+    Route::prefix('product')->group(function () {
+
+        Route::post('store', [ProductController::class, 'store']);
+
+        Route::get('show/{slug}', [ProductController::class, 'show']);
+
+        Route::post('update/{slug}', [ProductController::class, 'update']);
+
+        Route::put('delete/{slug}', [ProductController::class, 'delete']);
+    });
 });
 
 

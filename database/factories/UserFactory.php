@@ -57,7 +57,7 @@ class UserFactory extends Factory
     public function run()
     {
         User::factory()
-                ->count(50)
-                ->create();
+            ->count(50)
+            ->create();
     }
 }

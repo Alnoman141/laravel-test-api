@@ -45,7 +45,7 @@ class UserController extends Controller
             $user->country = $request->country;
             try {
                 $user->save();
-                return response()->json(['success' => 'profile updateduccessful']);
+                return response()->json(['success' => 'profile updated successful']);
 
             } catch (\Exception $ex) {
                 return response()->json(['error' => $ex->getMessage()], 403);
