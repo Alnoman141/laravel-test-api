@@ -38,6 +38,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::put('/delete/{slug}', [UserController::class, 'delete']);
 
     Route::put('user/logout', [AuthController::class, 'logout']);
+
+    Route::post('user/change-password/{slug}', [AuthController::class, 'changePassword']);
 });
 
 
