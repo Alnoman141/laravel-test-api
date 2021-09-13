@@ -27,6 +27,10 @@ Route::post('register', [AuthController::class, 'register']);
 
 Route::post('login', [AuthController::class, 'login']);
 
+Route::post('forget-password/send-otp', [AuthController::class, 'sendOTP']);
+
+Route::post('change-password-by-otp', [AuthController::class, 'changePasswordByOTP']);
+
 Route::get('products', [ProductController::class, 'index']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {

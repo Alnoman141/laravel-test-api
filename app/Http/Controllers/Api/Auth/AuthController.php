@@ -9,8 +9,10 @@ use Illuminate\Support\Facades\Hash;
 use Validator;
 use Illuminate\Support\Str;
 use App\JsonResponse;
+use App\Notifications\SendOTP;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Seshac\Otp\Otp;
 
 
 
@@ -22,7 +24,7 @@ class AuthController extends Controller
      * @return void
      */
     public function __construct() {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register' ,'sendOTP', 'changePasswordByOTP']]);
     }
 
     public function register(Request $request){
@@ -48,6 +50,7 @@ class AuthController extends Controller
             }
         }
     }
+
 
     public function login(Request $request){
         $credentials = $request->only('email', 'password');
@@ -93,6 +96,53 @@ class AuthController extends Controller
         }
 
     }
+
+    public function generateOTP($identifier){
+        $otp = $otp =  Otp::setValidity(30)->setLength(4)->setOnlyDigits(false)->generate($identifier);
+        return $otp;
+    }
+
+    public function sendOTP(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 403);
+        } else {
+            $user = User::where('email', $request->email)->first();
+            if($user){
+                $otp = $this->generateOTP($request->email);
+                $this->user = $user;
+                $user->notify(new SendOTP($otp));
+                return response()->json(['success' => 'An OTP has been sent to your email & your OTP is '.$otp->token]);
+            } else {
+                return response()->json(['error' => 'User not found with this email'], 404);
+            }
+            
+        }
+
+    }
+
+    public function changePasswordByOTP(Request $request){
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email',
+            'password' => 'required|string|min:6|confirmed',
+        ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 403);
+        } else {
+            $verify = Otp::validate($request->email, $request->otp);
+            if($verify){
+                $user = User::where('email', $request->email)->first();
+                $user->password = Hash::make($request->password);
+                $user->save();
+                return response()->json(['success' => 'Password Changed Successful'], 200);
+            } else {
+                return response()->json(['error' => 'Invalid OTP'], 401);
+            }
+        }
+     }
+
 
     
     private function getValidationRules()
