@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Validator;
@@ -17,7 +18,7 @@ class ProductController extends Controller
     public function index(){
         $products = Product::all();
         if(isset($products)){
-            return response()->json(['products' => $products], 200);
+            return ProductResource::collection($products);
         } else {
             return response()->json(['error' => 'No products found']);
         }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\BrandController;
+use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use Illuminate\Http\Request;
@@ -35,6 +37,8 @@ Route::get('products', [ProductController::class, 'index']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users/', [UserController::class, 'index']);
+    Route::get('brands/', [BrandController::class, 'index']);
+    Route::get('categories/', [CategoryController::class, 'index']);
 
     Route::prefix('user')->group(function () {
         Route::get('profile', [UserController::class, 'profile']);

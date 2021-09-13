@@ -22,13 +22,13 @@ class ProductFactory extends Factory
      */
     public function definition()
     {
-        $name = $this->faker->name();
+        $name = $this->faker->sentence();
         $slug = Str::slug($name).'-'.uniqid();
         return [
             'name' => $name,
             'slug' => $slug,
-            'brand_id' => $this->faker->randomDigit,
-            'category_id' => $this->faker->randomDigit,
+            'brand_id' => $this->faker->numberBetween($min = 1, $max = 9),
+            'category_id' => $this->faker->numberBetween($min = 1, $max = 9),
             'price' => $this->faker->numberBetween($min = 1000, $max = 9000) // password
         ];
     }
