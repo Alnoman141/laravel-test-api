@@ -114,7 +114,7 @@ class AuthController extends Controller
                 $otp = $this->generateOTP($request->email);
                 $this->user = $user;
                 $user->notify(new SendOTP($otp));
-                return response()->json(['success' => 'An OTP has been sent to your email & your OTP is '.$otp->token]);
+                return response()->json(['success' => 'An OTP has been sent to your email']);
             } else {
                 return response()->json(['error' => 'User not found with this email'], 404);
             }
@@ -132,7 +132,8 @@ class AuthController extends Controller
             return response()->json(['errors' => $validator->errors()], 403);
         } else {
             $verify = Otp::validate($request->email, $request->otp);
-            if($verify){
+            // dd();
+            if($verify->status === true){
                 $user = User::where('email', $request->email)->first();
                 $user->password = Hash::make($request->password);
                 $user->save();
