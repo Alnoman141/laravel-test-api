@@ -23,7 +23,7 @@ class ProductImageFactory extends Factory
     {
         return [
             'product_id' => $this->faker->numberBetween($min = 1, $max = 20),
-            'image' => $this->faker->image('public/storage/images',640,480, null, false),
+            'image' => $this->faker->image('public/images',640,480, null, false),
         ];
     }
 }

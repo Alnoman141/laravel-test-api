@@ -11,6 +11,8 @@ class BrandController extends Controller
     public function __construct() {
         $this->middleware('auth:api');
     }
+
+    // index is used for load all the brand
     public function index(){
         $brands = Brand::all();
         if(isset($brands)){

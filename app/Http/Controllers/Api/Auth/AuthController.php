@@ -27,6 +27,7 @@ class AuthController extends Controller
         $this->middleware('auth:api', ['except' => ['login', 'register' ,'sendOTP', 'changePasswordByOTP']]);
     }
 
+    // register is used for register users
     public function register(Request $request){
         $validator = Validator::make(
             $request->all(),
@@ -52,6 +53,7 @@ class AuthController extends Controller
     }
 
 
+    // login is used for login user
     public function login(Request $request){
         $credentials = $request->only('email', 'password');
         if (!Auth::attempt($credentials)) {
@@ -70,6 +72,7 @@ class AuthController extends Controller
 
     }
 
+    // logout is used for logout a user
     public function logout(Request $request)
     {
         Auth::guard('web')->logout();
@@ -77,6 +80,7 @@ class AuthController extends Controller
         return response()->json((new JsonResponse())->success(['message' => 'logout successful']), Response::HTTP_OK);
     }
 
+    // changePassword is used for changePassword a user password
     public function changePassword(Request $request, $slug){
         $validator = Validator::make($request->all(), [
             'password' => 'required|string|min:6',
@@ -97,11 +101,13 @@ class AuthController extends Controller
 
     }
 
+    // generateOTP is used for generate a otp for a user
     public function generateOTP($identifier){
         $otp = $otp =  Otp::setValidity(30)->setLength(4)->setOnlyDigits(false)->generate($identifier);
         return $otp;
     }
 
+    // sendOTP is used for send a otp to user email
     public function sendOTP(Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -123,6 +129,7 @@ class AuthController extends Controller
 
     }
 
+    // changePasswordByOTP is used for change password
     public function changePasswordByOTP(Request $request){
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -145,7 +152,7 @@ class AuthController extends Controller
      }
 
 
-    
+    // getValidationRules is used for validate all request
     private function getValidationRules()
     {
         return [

@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
+    // index is used for load all user
     public function index(){
         $users = User::all();
         if(isset($users)){
@@ -19,6 +20,7 @@ class UserController extends Controller
         
     }
 
+    // profile is used for view auth user's profile
     public function profile(){
         $user = Auth::user();
 
@@ -29,6 +31,7 @@ class UserController extends Controller
         }
     }
 
+    // show is used for view a user's information
     public function show($slug){
         $user = User::where('slug', $slug)->first();
         if(isset($user)){
@@ -38,6 +41,7 @@ class UserController extends Controller
         }
     }
 
+    // update is used for update a user information
     public function update(Request $request){
         $user = Auth::user();
         if(isset($user)){
@@ -56,6 +60,7 @@ class UserController extends Controller
         
     }
 
+    // delete is used for delete a user
     public function delete($slug){
         $user = User::where('slug', $slug)->first();
         if(isset($user)){

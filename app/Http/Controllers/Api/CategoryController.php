@@ -11,6 +11,8 @@ class CategoryController extends Controller
     public function __construct() {
         $this->middleware('auth:api');
     }
+
+    // index is used for load all the category
     public function index(){
         $categories = Category::all();
         if(isset($categories)){
