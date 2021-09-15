@@ -57,11 +57,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::post('store', [ProductController::class, 'store']);
 
+        Route::post('upload-image', [ProductController::class, 'uploadImage']);
+
         Route::get('show/{slug}', [ProductController::class, 'show']);
 
         Route::post('update/{slug}', [ProductController::class, 'update']);
 
         Route::put('delete/{slug}', [ProductController::class, 'delete']);
+
+        Route::post('delete/image', [ProductController::class, 'deleteImage']);
     });
 });
 

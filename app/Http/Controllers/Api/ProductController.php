@@ -5,9 +5,12 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ProductResource;
 use App\Models\Product;
+use App\Models\ProductImage;
 use Illuminate\Http\Request;
 use Validator;
 use Illuminate\Support\Str;
+use File;
+use Illuminate\Support\Arr;
 
 class ProductController extends Controller
 {
@@ -15,21 +18,41 @@ class ProductController extends Controller
         $this->middleware('auth:api', ['except' => ['index']]);
     }
 
-    public function index(){
-        $products = Product::all();
-        if(isset($products)){
-            return ProductResource::collection($products);
-        } else {
-            return response()->json(['error' => 'No products found']);
+    public function index(Request $request){
+        $searchParams = $request->all();
+        $productQuery = Product::query();
+        $keyword = Arr::get($searchParams, 'keyword', '');
+
+        if (!empty($keyword)) {
+            $productQuery->where('name', 'LIKE', '%' . $keyword . '%');
         }
+
+        return ProductResource::collection($productQuery->orderBy('id', 'desc')->get());
         
+    }
+
+    public function uploadImage(Request $request){
+        if($request->file('photo')){
+            $file_name = 'product-'.uniqid().'.'.$request->file('photo')->extension();
+            $path = $request->file('photo')->storePubliclyAs(
+                'images',
+                $file_name
+            );
+            return response()->json(['imageName' => $path], 200);
+        } else {
+            return response()->json(['No image found']);
+        }
     }
 
     public function store(Request $request){
         $product = new Product();
+        $product->slug = Str::slug($request->name).'-'.uniqid();
         $this->saveData($request, $product);
         try {
             $product->save();
+            if(count($request->images) > 0){
+                $this->saveImages($request->images, $product);
+            }
             return response()->json(['success' => 'product added successfully']);
 
         } catch (\Exception $ex) {
@@ -51,17 +74,25 @@ class ProductController extends Controller
         }else{
             // creating new product
             $product->name = $request->name;
-            $product->slug = Str::slug($request->name).'-'.uniqid();
             $product->brand_id = $request->brand_id;
             $product->category_id = $request->category_id;
             $product->price = $request->price;
         }
     }
 
+    public function saveImages($images, $product){
+        foreach($images as $image){
+            $img = new ProductImage();
+            $img->image = $image['image'];
+            $img->product_id = $product->id;
+            $img->save();
+        }
+    }
+
     public function show($slug){
         $product = Product::where('slug', $slug)->first();
         if(isset($product)){
-            return response()->json(['product' => $product], 200);
+            return new ProductResource($product);
         } else {
             return response()->json(['error' => 'product not found']);
         }
@@ -73,6 +104,9 @@ class ProductController extends Controller
             $this->saveData($request, $product);
             try {
                 $product->save();
+                if(count($request->images) > 0){
+                    $this->saveImages($request->images, $product);
+                }
                 return response()->json(['success' => 'product updated successfully']);
 
             } catch (\Exception $ex) {
@@ -90,6 +124,24 @@ class ProductController extends Controller
             return response()->json(['success' => 'product has been deleted']);
         } else {
             return response()->json(['error' => 'product not found']);
+        }
+    }
+
+    public function deleteImage(Request $request){
+        if($request->id === null){
+            if (File::exists($request->image)){
+                File::delete($request->image);
+            }
+            return response()->json(['success' => 'image has been deleted']);
+        } else {
+            $img = ProductImage::find($request->id);
+            if($img){
+                if (File::exists($img->image)){
+                    File::delete($img->image);
+                }
+                $img->delete();
+                return response()->json(['success' => 'image has been deleted']);
+            }
         }
     }
 
