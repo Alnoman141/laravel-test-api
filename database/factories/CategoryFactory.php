@@ -29,7 +29,7 @@ class CategoryFactory extends Factory
         ];
 
         foreach ($categories as $category) {
-            $user = Category::create([
+            $newCat = Category::create([
                 'name' => $category,
             ]);
 

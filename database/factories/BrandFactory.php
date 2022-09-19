@@ -29,7 +29,7 @@ class BrandFactory extends Factory
         ];
 
         foreach ($brands as $brand) {
-            $user = Brand::create([
+            $newBrand = Brand::create([
                 'name' => $brand,
             ]);
 
