@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Role;
 use Validator;
-use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
@@ -14,9 +13,15 @@ class RoleController extends Controller
 
     public function index(){
         $roles = Role::orderBy('id', 'desc')->get();
-        return response()->json(['roles' => $roles, 'status' => 200]);
+        if($roles){
+            return response()->json(['roles' => $roles, 'status' => 200]);
+        } else {
+            return response()->json(['error' => 'no role found!', 'status' => 403]);
+        }
+
     }
 
+    // create new role
     public function store(Request $request){
         // check validation rules from getValidationRules method
         $validator = Validator::make(
@@ -39,6 +44,7 @@ class RoleController extends Controller
         }
     }
 
+    // update a role
     public function update(Request $request, $id){
         // check validation rules from getValidationRules method
         $validator = Validator::make(
@@ -53,10 +59,14 @@ class RoleController extends Controller
         }else{
             // creating new role
             $role = Role::find($id);
-            $role->name = $request->name;
-            $role->save();
+            if($role){
+                $role->name = $request->name;
+                $role->save();
 
-            return response()->json(['success' => 'role updated successfully', 'status' => 200]);
+                return response()->json(['success' => 'role updated successfully', 'status' => 200]);
+            } else {
+                return response()->json(['error' => 'no role found with this ID!', 'status' => 403]);
+            }
         }
     }
 

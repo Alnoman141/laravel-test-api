@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\PermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -51,11 +52,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('permission')->group(function () {
-        Route::get('/', [UserController::class, 'index']);
+        Route::get('/', [PermissionController::class, 'index']);
 
-        Route::post('/', [UserController::class, 'store']);
+        Route::post('/', [PermissionController::class, 'store']);
 
-        Route::put('/{id}', [UserController::class, 'update']);
+        Route::post('/update/{id}', [PermissionController::class, 'update']);
 
     });
 
