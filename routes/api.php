@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleHasPermissionController;
+use App\Http\Controllers\Api\ModelHasRoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -71,6 +72,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/', [RoleHasPermissionController::class, 'store']);
 
         Route::post('/update/{role_id}', [RoleHasPermissionController::class, 'update']);
+
+    });
+
+    // model has role routes
+    Route::prefix('model-has-role')->group(function () {
+
+        Route::post('/', [ModelHasRoleController::class, 'store']);
+
+        Route::post('/update/{model_id}', [ModelHasRoleController::class, 'update']);
 
     });
 
