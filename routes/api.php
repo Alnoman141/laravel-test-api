@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\BrandController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\RoleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +40,24 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('users/', [UserController::class, 'index']);
     Route::get('brands/', [BrandController::class, 'index']);
     Route::get('categories/', [CategoryController::class, 'index']);
+
+    Route::prefix('role')->group(function () {
+        Route::get('/', [RoleController::class, 'index']);
+
+        Route::post('/', [RoleController::class, 'store']);
+
+        Route::post('/update/{id}', [RoleController::class, 'update']);
+
+    });
+
+    Route::prefix('permission')->group(function () {
+        Route::get('/', [UserController::class, 'index']);
+
+        Route::post('/', [UserController::class, 'store']);
+
+        Route::put('/{id}', [UserController::class, 'update']);
+
+    });
 
     Route::prefix('user')->group(function () {
         Route::get('profile', [UserController::class, 'profile']);
