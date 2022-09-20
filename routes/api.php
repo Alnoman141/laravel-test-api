@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\Api\PermissionController;
+use App\Http\Controllers\Api\RoleHasPermissionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -42,7 +43,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('brands/', [BrandController::class, 'index']);
     Route::get('categories/', [CategoryController::class, 'index']);
 
+    // role routes
     Route::prefix('role')->group(function () {
+
         Route::get('/', [RoleController::class, 'index']);
 
         Route::post('/', [RoleController::class, 'store']);
@@ -51,7 +54,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     });
 
+    // permission routes
     Route::prefix('permission')->group(function () {
+
         Route::get('/', [PermissionController::class, 'index']);
 
         Route::post('/', [PermissionController::class, 'store']);
@@ -60,7 +65,18 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     });
 
+    // role has permission routes
+    Route::prefix('role-has-permission')->group(function () {
+
+        Route::post('/', [RoleHasPermissionController::class, 'store']);
+
+        Route::post('/update/{role_id}', [RoleHasPermissionController::class, 'update']);
+
+    });
+
+    // user routes
     Route::prefix('user')->group(function () {
+
         Route::get('profile', [UserController::class, 'profile']);
 
         Route::post('profile/update', [UserController::class, 'update']);
@@ -73,6 +89,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::post('change-password/{slug}', [AuthController::class, 'changePassword']);
     });
+
+    // product routes
     Route::prefix('product')->group(function () {
 
         Route::post('store', [ProductController::class, 'store']);
