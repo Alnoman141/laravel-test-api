@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\UserResource;
 
 class UserController extends Controller
 {
@@ -17,7 +18,7 @@ class UserController extends Controller
         } else {
             return response()->json(['error' => 'No user not found']);
         }
-        
+
     }
 
     // profile is used for view auth user's profile
@@ -35,7 +36,7 @@ class UserController extends Controller
     public function show($slug){
         $user = User::where('slug', $slug)->first();
         if(isset($user)){
-            return response()->json(['user' => $user ], 200);
+            return response()->json(['user' =>  new UserResource($user)], 200);
         } else {
             return response()->json(['error' => 'User not found']);
         }
@@ -57,7 +58,7 @@ class UserController extends Controller
         } else {
             return response()->json(['error' => 'User not found']);
         }
-        
+
     }
 
     // delete is used for delete a user
@@ -70,5 +71,5 @@ class UserController extends Controller
             return response()->json(['error' => 'User not found']);
         }
     }
-    
+
 }

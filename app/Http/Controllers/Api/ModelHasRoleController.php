@@ -45,6 +45,8 @@ class ModelHasRoleController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 403);
         }else{
+
+            $model_id = $request['model_id'];
             $modelRole = ModelHasRole::where('model_id', $model_id)->update($request->all());
 
             return response()->json(['success' => 'Role has been updated for the model','status' => 200]);

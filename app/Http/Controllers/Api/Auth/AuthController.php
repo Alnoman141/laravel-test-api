@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Api\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Role;
+use App\Models\RoleHasPermission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Validator;
@@ -13,6 +15,7 @@ use App\Notifications\SendOTP;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Seshac\Otp\Otp;
+use App\Http\Resources\UserResource;
 
 
 
@@ -45,7 +48,9 @@ class AuthController extends Controller
             $user->slug = Str::slug($request->name);
             try {
                 $user->save();
-                return response()->json(['success' => 'registration successful'], 200);
+                $role = Role::findByName('Student');
+                $user->syncRoles($role);
+                return response()->json(['success' => 'registration successful', 'user' => new UserResource($user)], 200);
             } catch (\Exception $ex) {
                 return response()->json(['error' => $ex->getMessage()], 403);
             }
@@ -63,7 +68,7 @@ class AuthController extends Controller
         $user = $request->user();
 
         $tokenResult  = $user->createToken('authToken')->plainTextToken;
-        
+
         return response()->json([
             'access_token' => $tokenResult,
             'token_type' => 'bearer',
@@ -124,7 +129,7 @@ class AuthController extends Controller
             } else {
                 return response()->json(['error' => 'User not found with this email'], 404);
             }
-            
+
         }
 
     }
